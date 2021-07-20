@@ -1,9 +1,35 @@
-let player : game.LedSprite = null
-
-let pipes : Pipe[] = []
-let points = 0
+function CheckForCollisions () {
+    for (let k = 0; k <= pipes.length - 1; k++) {
+        let pipe = pipes[k]
+        for (let l = 0; l <= pipe.obstacles.length - 1; l++) {
+            if (pipe.obstacles[l].y() == player.y() && pipe.obstacles[l].x() == player.x()) {
+                Die()
+            }
+            if (player.y() == 4){
+                Die()
+            }
+        }
+    }
+}
+function Die () {
+    basic.showString("You have " + points.toString() + " points!", 70)
+game.gameOver()
+}
+input.onButtonPressed(Button.A, function () {
+    player.change(LedSpriteProperty.Y, -1)
+})
+input.onButtonPressed(Button.B, function () {
+    changePlayer()
+})
+function changePlayer () {
+    player.change(LedSpriteProperty.Y, 1)
+}
+let element: game.LedSprite = null
+let pipe = 0
 let queue_free : Pipe[] = []
-
+let points = 0
+let pipes : Pipe[] = []
+let player : game.LedSprite = null
 class Pipe {
     obstacles : game.LedSprite[]
     obstacleEmptyY:number
@@ -24,9 +50,9 @@ class Pipe {
 
 
     moveForward () {
-        for (let i = 0; i < this.obstacles.length; i++){
-            this.obstacles[i].change(LedSpriteProperty.X, -1)
-            if (this.obstacles[i].x() == 0){
+        for (let j = 0; j < this.obstacles.length; j++){
+            this.obstacles[j].change(LedSpriteProperty.X, -1)
+            if (this.obstacles[j].x() == 0){
                 this.Queue_for_Deletion()
             }
         }
@@ -42,57 +68,23 @@ class Pipe {
 
 
 }
-
-
-function CheckForCollisions (){
-    for (let i = 0; i < pipes.length; i++){
-        let pipe = pipes[i]
-        for (let j = 0; j < pipe.obstacles.length; j++){
-            if (pipe.obstacles[j].y() === player.y() && pipe.obstacles[j].x() === player.x()){
-                Die()
-            }
-        }
-
-    }
-}
-
-function Die (){
-    basic.showString("You have " + points.toString() + " points!", 70)
-    game.gameOver()
-}
-
 player = game.createSprite(1, 2)
 player.set(LedSpriteProperty.Blink, 300)
-
-basic.forever(function(){
-    for (let i = 0; i < pipes.length; i++){
-        pipes[i].moveForward()
-
+loops.everyInterval(2000, function () {
+    let p = new Pipe()
+points += 1
+})
+basic.forever(function () {
+    for (let m = 0; m <= pipes.length - 1; m++) {
+        pipes[m].moveForward()
     }
+    changePlayer()
     CheckForCollisions()
     basic.pause(500)
-    for (let i = 0; i < queue_free.length; i++){
-        for (let j = 0; j < queue_free[i].obstacles.length; j++){
-            let element = queue_free[i].obstacles[j]
+    for (let n = 0; n <= queue_free.length - 1; n++) {
+        for (let o = 0; o <= queue_free[n].obstacles.length - 1; o++) {
+            element = queue_free[n].obstacles[o]
             element.delete()
         }
     }
-})
-
-function changePlayer(){
-    player.change(LedSpriteProperty.Y, 1)
-
-}
-
-input.onButtonPressed(Button.A, function(){
-    player.change(LedSpriteProperty.Y, -1)
-})
-
-input.onButtonPressed(Button.B, function(){
-changePlayer()
-})
-
-loops.everyInterval(2000, () => {
-    let p = new Pipe()
-    points++
 })
